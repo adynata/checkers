@@ -1,7 +1,7 @@
 require 'io/console'
 
 # Reads keypresses from the user including 2 and 3 escape character sequences.
-module Readable
+module Cursor
 
   def read_char
     STDIN.echo = false

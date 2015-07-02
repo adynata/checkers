@@ -1,6 +1,6 @@
 # require 'colorize'
 require 'byebug'
-require_relative 'board' #only when testing
+# require_relative 'board' #only when testing
 
 class Piece
   attr_accessor :kinged, :current_position, :board
@@ -60,23 +60,15 @@ class Piece
     end
   end
 
-  def perform_slide
-
-  end
-
-  def perform_jump
-    # removes a piece from the board
-  end
-
   def perform_move_sequence
   end
 
   def valid_slides
-
+    all_slides.select { |pos| board[*pos].empty_square? }
   end
 
-  def valid_jumps
-    #looks at all jumps for empty positions
+  def empty_square?
+    false
   end
 
   def all_slides
@@ -101,16 +93,32 @@ class Piece
     [first_pos, diff].transpose.map {|x| x.reduce(:+)}
   end
 
-  def all_jumps
-    maybe_capturable = all_slides.select { |pos| board[*pos].color == opponent_color }
+  def valid_jumps
+    maybe_capturable = all_slides.select do |pos|
+      board[*pos].color == opponent_color
+    end
     maybe_capturable.select do |pos|
       pos_to_check = trans_move(current_position, pos)
-      board[*pos_to_check].empty?
+      board[*pos_to_check].empty_square?
     end
   end
 
+  def perform_slide(beg_pos, end_pos)
+    board[*end_pos] = self
+    current_position = end_pos
+    board[*beg_pos] = EmptySquare.new
+  end
 
-  def on_board?(pos) #can make this a call on object directly?
+  def perform_jump(beg_pos, end_pos)
+    board[*end_pos] = self
+    current_position = end_pos
+    middle_pos = trans_move(end_pos, beg_pos)
+    board[*middle_pos] = EmptySquare
+    board[*beg_pos] = EmptySquare.new
+  end
+
+
+  def on_board?(pos) # can make this a call on object directly?
     potential_move.all? { |pos| pos.between?(0, 7) }
   end
 
@@ -145,11 +153,3 @@ class EmptySquare
   end
 
 end
-
-piece = Piece.new(:r, [1,1], Board.new)
-
-puts "slides"
-p piece.all_slides
-
-puts "jumps"
-p piece.all_jumps

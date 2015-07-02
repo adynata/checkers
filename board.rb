@@ -1,4 +1,4 @@
-# require_relative 'piece'
+require_relative 'piece'
 require_relative 'cursor'
 require 'byebug'
 require 'colorize'
@@ -8,7 +8,7 @@ class Board
 
   attr_accessor :grid, :cursor
 
-  include Readable
+  include Cursor
 
   MOVE_MAP = {
   "DOWN ARROW" => [1, 0],
@@ -110,6 +110,16 @@ class Board
 end
 
 
-# board = Board.new
-#
-# board.render
+board = Board.new
+
+board.render
+
+piece = Piece.new(:r, [2,2], Board.new)
+
+p piece.current_position
+
+puts "slides"
+p piece.valid_slides
+
+puts "jumps"
+p piece.valid_jumps
