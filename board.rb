@@ -1,26 +1,26 @@
-require_relative 'piece'
+# require_relative 'piece'
+require_relative 'cursor'
 require 'byebug'
 require 'colorize'
 
-class EmptySquare
-  # attr_reader
-
-  def initialize
-    @empty = true
-  end
-
-  def to_view
-    "   "
-  end
-
-end
 
 class Board
 
-  attr_accessor :grid
+  attr_accessor :grid, :cursor
+
+  include Readable
+
+  MOVE_MAP = {
+  "DOWN ARROW" => [1, 0],
+  "RIGHT ARROW" => [0, 1],
+  "UP ARROW" => [-1, 0],
+  "LEFT ARROW" => [0, -1],
+  "RETURN" => [0, 0]
+  }
 
   def initialize
     @grid = Array.new(8) { Array.new(8) {EmptySquare.new} }
+    # @cursor = [0, 0]
     populate_board
   end
 
@@ -41,6 +41,25 @@ class Board
     end
 
   end
+
+  # def move_cursor
+  #   possible_selection = get_move
+  #   while on_board?(possible_selection)
+  #     possible_selection = get_move
+  #   end
+  #   @cursor = possible_selection
+  # end
+
+
+  def on_board?(potential_move)
+   potential_move.all? { |pos| pos.between?(0, 7) }
+  end
+
+  # def get_move
+  #   next_move = show_single_key
+  #   cursor_diff = MOVE_MAP[next_move]
+  #   [@cursor, cursor_diff].transpose.map {|x| x.reduce(:+)}
+  # end
 
   def black_positions
     black_positions = [
@@ -66,7 +85,9 @@ class Board
       puts
       print "#{idx1} "
       row.each_with_index do |place, idx2|
-        if (idx1 + idx2) % 2 == 0
+        if @cursor == [idx1, idx2]
+          print place.to_view.colorize(background: :red)
+        elsif (idx1 + idx2) % 2 == 0
           # debugger
           print place.to_view.colorize(background: :blue)
         else
@@ -89,6 +110,6 @@ class Board
 end
 
 
-board = Board.new
-
-board.render
+# board = Board.new
+#
+# board.render
